@@ -2,7 +2,10 @@
 Evaluates algorithms that convert preferences to value functions using rational
 representations.
 """
+import random
+
 from itertools import product
+from functools import partial
 
 """
 Utilities
@@ -157,8 +160,7 @@ def alg1_weak_two(reward, gamma, t_list):
 
 def alg_niko(reward, gamma, t_list):
   """
-  This algorithm works in this context. I believe it will work generally. It
-  only uses O(T) histories to compute the reward and gamma.
+  This is Niko's proposed algorithm based on an earlier revision of the paper.
   """
   # get all 1 and 2 step histories (just |T| + 2|T| histories, different from paper)
   twos = [h for h in get_two_step_hists(t_list) if h.split(',')[0] == h.split(',')[1]]
@@ -183,9 +185,6 @@ def alg_niko(reward, gamma, t_list):
 """
 Experiments
 """
-import random
-from functools import partial
-
 def eval(true_r, true_g, alg_r, alg_g, eps=10e-6, verbose=False):
   # define utility functions
   true_util = partial(utility, true_r, true_g)
@@ -259,4 +258,5 @@ def main():
   for k, v in res.items():
     print(f'{k}: {v}/{num_trials}')
 
-main()
+if __name__ == '__main__':
+  main()

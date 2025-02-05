@@ -1,0 +1,17 @@
+# Start your image with a node base image
+FROM python:3.9
+
+# The /app directory should act as the main application directory
+WORKDIR /app
+
+# Copy local directories to the current local directory of our docker image (/app)
+COPY ./src ./src
+
+# Install 
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+ENV PYTHONPATH=/app
+
+# Start the app using serve command
+CMD [ "python", "src/exact_reward_hypothesis.py" ]
