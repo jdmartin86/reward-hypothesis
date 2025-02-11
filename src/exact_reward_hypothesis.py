@@ -59,7 +59,7 @@ def assign_utility(sorted_hist_list, p):
   eps_idx = sorted_hist_list.index('e') + 1  # want 1-indexed array
   n = len(sorted_hist_list)
 
-  u = {k: p[k]*(1 - eps_idx) + (1-p[k])*(1-eps_idx/n) for k in sorted_hist_list}
+  u = {k: p[k]*(1 - eps_idx) + (1 - p[k])*(1 - eps_idx / n) for k in sorted_hist_list}
   u['e'] = 0
   return u
 
@@ -212,6 +212,18 @@ def eval(true_r, true_g, alg_r, alg_g, eps=10e-6, verbose=False):
   return res
 
 
+def get_random_rational_value_function(min_t, max_t):
+  num_transitions = random.randint(min_t, max_t)
+
+  reward = {f'{i}' : random.randint(-10, 10) / random.randint(1, 10) for i in range(1, num_transitions)}
+  reward['e'] = 0
+
+  gamma = {f'{i}' : 1 / random.randint(1, 10) for i in range(1, num_transitions)}
+  gamma['e'] = 1
+
+  return reward, gamma
+
+
 def get_random_value_function(min_t, max_t):
   num_transitions = random.randint(min_t, max_t)
 
@@ -237,7 +249,8 @@ def main():
   res = {k: 0 for k in algs}
 
   for i in range(num_trials):
-    reward, gamma = get_random_value_function(min_t, max_t)
+    # reward, gamma = get_random_value_function(min_t, max_t)
+    reward, gamma = get_random_rational_value_function(min_t, max_t)
     t_list = list(reward.keys())
 
     for name, alg in algs.items():
