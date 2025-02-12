@@ -69,7 +69,7 @@ def get_gammas(utils):
   Shouldn't change the result.
   """
   t_list = [k for k in utils if len(k.split(',')) == 1 and k != 'e']
-  gamma = {k: (utils[f"{k},{k}"] - utils[k]) / utils[k] for k in t_list}
+  gamma = {k: utils[f"{k},{k}"] / utils[k] - 1 for k in t_list}
   gamma['e'] = 1
   return gamma
 
@@ -215,7 +215,7 @@ def eval(true_r, true_g, alg_r, alg_g, eps=10e-6, verbose=False):
 def get_random_rational_value_function(min_t, max_t):
   num_transitions = random.randint(min_t, max_t)
 
-  reward = {f'{i}' : random.randint(-10, 10) / random.randint(1, 10) for i in range(1, num_transitions)}
+  reward = {f'{i}' : random.choice([-1, 1]) * random.randint(1, 10) / random.randint(1, 10) for i in range(1, num_transitions)}
   reward['e'] = 0
 
   gamma = {f'{i}' : 1 / random.randint(1, 10) for i in range(1, num_transitions)}
@@ -240,9 +240,6 @@ def main():
   min_t, max_t = 3, 100
 
   algs = {
-        'alg1_strict': alg1_strict, 
-        'alg1_weak_one': alg1_weak_one,
-        'alg1_weak_two': alg1_weak_two,
         'alg_niko': alg_niko
   }
 
@@ -252,7 +249,6 @@ def main():
     # reward, gamma = get_random_value_function(min_t, max_t)
     reward, gamma = get_random_rational_value_function(min_t, max_t)
     t_list = list(reward.keys())
-
     for name, alg in algs.items():
       alg_r, alg_g = alg(reward, gamma, t_list)
       inner_res = eval(reward, gamma, alg_r, alg_g)
