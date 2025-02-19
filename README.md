@@ -1,12 +1,29 @@
-### The Reward Hypothesis
+# The Reward Hypothesis
+
+This repository contains code for computing a reward and discount function consistent with preferences that respect the preconditions under which the Reward Hypothesis holds.
 
 The Reward Hypothesis claims that   
 _All that we mean by goals and purposes can be well thought of as maximization of a scalar reward signal._  
 — Michael Littman and Rich Sutton
 
-This repository contains an implementation of the reward and discount design algorithm.
+2023 ICML Paper: [Settling the Reward Hypothesis](https://arxiv.org/abs/2212.10420).
 
-Paper: [Settling the Reward Hypothesis](https://arxiv.org/abs/2212.10420).
+#### Build and Run
+1. Clone this git repo and enter the directory.
+```
+git clone git@github.com:jdmartin86/reward-hypothesis.git
+cd reward-hypothesis
+```
+
+2. Build the Docker image.
+```
+docker build -t rh .
+```
+
+3. Run the Docker image.
+```
+docker run rh
+```
 
 #### Citation
 To cite this paper use the following
