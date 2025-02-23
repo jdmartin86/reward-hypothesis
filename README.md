@@ -1,6 +1,6 @@
 # The Reward Hypothesis
 
-This repository contains code for computing a reward and discount function consistent with preferences that respect the preconditions under which the Reward Hypothesis holds.
+This repository contains code for computing a reward and discount function from preferences under the Reward Hypothesis holds.
 
 The Reward Hypothesis claims that   
 _All that we mean by goals and purposes can be well thought of as maximization of a scalar reward signal._  
