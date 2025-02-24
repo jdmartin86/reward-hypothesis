@@ -2,11 +2,15 @@
 
 This repository contains code for computing a reward and discount function that respect preconditions for the Reward Hypothesis.
 
+#### Summary
 The Reward Hypothesis claims that   
 _All that we mean by goals and purposes can be well thought of as maximization of a scalar reward signal._  
 This idea is due to Michael Littman and Rich Sutton.
 
-2023 ICML Paper: [Settling the Reward Hypothesis](https://arxiv.org/abs/2212.10420).
+The 2023 ICML paper [Settling the Reward Hypothesis](https://arxiv.org/abs/2212.10420) described the formal preconditions under which the Reward Hypothesis holds.
+
+📝 Paper: [Settling the Reward Hypothesis](https://arxiv.org/abs/2212.10420).
+🎞️ Slides: [Spotlight presentation](https://icml.cc/media/icml-2023/Slides/25534_aJY3dQW.pdf).
 
 #### Build and Run
 1. Clone this git repo and enter the directory.
