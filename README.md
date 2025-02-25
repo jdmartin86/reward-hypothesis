@@ -1,6 +1,6 @@
 # The Reward Hypothesis
 
-This repository contains code for computing a reward and discount function that respect preconditions for the Reward Hypothesis.
+This repository contains code for computing reward and discount functions that respect the preconditions of the Reward Hypothesis.
 
 #### Summary
 The Reward Hypothesis claims that   
