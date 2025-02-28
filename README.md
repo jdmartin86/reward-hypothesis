@@ -8,6 +8,9 @@ _All that we mean by goals and purposes can be well thought of as maximization o
 This idea is due to Michael Littman and Rich Sutton.
 
 The 2023 ICML paper, [Settling the Reward Hypothesis](https://arxiv.org/abs/2212.10420), described the formal preconditions under which the Reward Hypothesis holds.
+The paper also introduced an algorithm for computing rewards and discounts. 
+This algorithm returns approximate solutions within $\epsilon$ of the true rewards and discounts expressed by a preference relation over histories.
+In the repository, we also provide an exact algorithm that is theoretically guaranteed to produce a reinforcable representation of the goal.
 
 📝 Paper: [Settling the Reward Hypothesis](https://arxiv.org/abs/2212.10420).  
 🎞️ Slides: [Spotlight presentation](https://icml.cc/media/icml-2023/Slides/25534_aJY3dQW.pdf).
