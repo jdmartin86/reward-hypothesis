@@ -255,15 +255,7 @@ def main():
       success = all(v['close'] for k, v in inner_res.items())
       if success:
         res[name] += 1
-      
-      if 'niko' in name and not success:
-        for k in inner_res:
-          print(f'{k}:')
-          for j in inner_res[k]:
-            print(f'\t{j}\t=\t{inner_res[k][j]}')
-        print('\n\n')
-        0/0
-  
+        
   for k, v in res.items():
     print(f'{k}: {v}/{num_trials}')
 
