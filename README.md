@@ -36,7 +36,7 @@ docker run rh
 To cite this paper use the following
 ```
 @inproceedings{bowling2023settling,
-  title={Settling the reward hypothesis},
+  title={Settling the Reward Hypothesis},
   author={Bowling, Michael and Martin, John D and Abel, David and Dabney, Will},
   booktitle={International Conference on Machine Learning},
   pages={3003--3020},
