@@ -1,6 +1,8 @@
 # The Reward Hypothesis
 
-This repository contains code for computing reward and discount functions that respect the preconditions of the Reward Hypothesis.
+This repository contains code for computing reward and discount functions that respect the preconditions of the Reward Hypothesis. In particular, the repository contains two algorithms:
+1. Approximate algorithm from Bowling et al., 2023.
+2. Exact algorithm TODO.
 
 #### Summary
 The Reward Hypothesis claims that   
