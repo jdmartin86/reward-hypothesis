@@ -45,65 +45,6 @@ noncomputable def HistoryDistribution.cons (t : Transition O A)
     (P : HistoryDistribution O A) : HistoryDistribution O A :=
   PMF.map (fun h ↦ t :: h) P
 
--- Type helper
-theorem cons_apply_cons (t : Transition O A) (P : HistoryDistribution O A) (h : History O A) :
-    HistoryDistribution.cons O A t P (t :: h) = P h := by
-  unfold HistoryDistribution.cons
-  rw [PMF.map_apply, tsum_eq_single h]
-  · simp
-  · intro b hb
-    simp only [List.cons.injEq, true_and, ite_eq_right_iff]
-    intro e; exact absurd e.symm hb
-
-theorem cons_apply_not_mem (t : Transition O A) (P : HistoryDistribution O A) (h' : History O A)
-    (hh : h' ∉ Set.range (fun h : History O A ↦ t :: h)) :
-    HistoryDistribution.cons O A t P h' = 0 := by
-  unfold HistoryDistribution.cons
-  rw [PMF.map_apply]
-  refine ENNReal.tsum_eq_zero.2 fun a ↦ ?_
-  simp only [ite_eq_right_iff]
-  intro e; exact absurd ⟨a, e.symm⟩ hh
-
--- Type helper: prepending `t` to the Dirac lottery on `h` gives the Dirac lottery on `t :: h`.
-theorem cons_dirac (t : Transition O A) (h : History O A) :
-    HistoryDistribution.cons O A t (diracHistory O A h) = diracHistory O A (t :: h) := by
-  unfold HistoryDistribution.cons diracHistory
-  exact PMF.pure_map _ _
-
--- Lifts the additive rule u(t·h) = r(t) + γ(t)·u(h) from single histories to any
--- distribution P by reindexing the expected-utility sum along the injective map `t :: ·`.
-theorem u_cons (u : HistoryDistribution O A → ℝ) (r : Transition O A → ℝ) (g : Transition O A → ℝ)
-    (h_sub : ∀ (t : Transition O A) (h : History O A),
-        u (HistoryDistribution.cons O A t (diracHistory O A h))
-          = r t + g t * u (diracHistory O A h))
-    (hev : ∀ P : HistoryDistribution O A,
-      Summable (fun h : History O A ↦ (P h).toReal * u (diracHistory O A h)) ∧
-      u P = ∑' h : History O A, (P h).toReal * u (diracHistory O A h))
-    (t : Transition O A) (P : HistoryDistribution O A) :
-    u (HistoryDistribution.cons O A t P) = r t + g t * u P := by
-  let f : History O A → ℝ := fun h' ↦
-    (HistoryDistribution.cons O A t P h').toReal * u (diracHistory O A h')
-  have hreindex : ∑' h' : History O A, f h' = ∑' h : History O A, f (t :: h) := by
-    refine ((List.cons_injective (a := t)).tsum_eq (f := f) ?_).symm
-    intro h' hh'
-    by_contra hn
-    exact hh' (by
-      simp only [f]
-      rw [show HistoryDistribution.cons O A t P h' = 0 from
-        cons_apply_not_mem O A t P h' hn, ENNReal.toReal_zero, zero_mul])
-  rw [(hev _).2, (hev P).2]
-  change ∑' h' : History O A, f h' = _
-  rw [hreindex]
-  simp only [f, cons_apply_cons]
-  simp_rw [← cons_dirac, h_sub, mul_add]
-  have hs1 : Summable (fun h : History O A ↦ (P h).toReal) :=
-    ENNReal.summable_toReal (by simp [P.tsum_coe])
-  have h1 : ∑' h : History O A, (P h).toReal = 1 := by
-    rw [← ENNReal.tsum_toReal_eq (PMF.apply_ne_top P), P.tsum_coe, ENNReal.toReal_one]
-  have hs2 := (hev P).1.mul_left (g t)
-  simp_rw [mul_left_comm _ (g t)]
-  rw [Summable.tsum_add (hs1.mul_right _) hs2, tsum_mul_right, h1, one_mul, tsum_mul_left]
-
 -- Rationality Axioms
 variable [Preference (HistoryDistribution O A)]
 
@@ -129,7 +70,7 @@ def vNMAxioms : Prop :=
 
 -- Theorem 3.1 (von Neumann Morgenstern Theorem)
 theorem vNM_Theorem :
-  vNMAxioms O A↔
+  vNMAxioms O A ↔
     ∃ u : HistoryDistribution O A → ℝ,
       u (diracHistory O A (ε O A)) = 0 ∧
       (∀ P Q : HistoryDistribution O A, (P ≽ Q) ↔ u Q ≤ u P) ∧
@@ -170,6 +111,60 @@ def A5_TemporalγIndifference : Prop :=
 
 def SatisfiesAxioms : Prop :=
   vNMAxioms O A ∧ A5_TemporalγIndifference O A
+
+-- Theorem to lift subadditivity from single histories to any distribution.
+theorem distributional_subadditive_utility
+  (u : HistoryDistribution O A → ℝ)
+  (r : Transition O A → ℝ )
+  (γ : Transition O A → ClosedInterval01)
+  (h_sub : -- Subadditivity for diracs.
+    ∀ t : Transition O A, ∀ h : History O A,
+    let δ_h := (diracHistory O A h)
+    let δ_th := (HistoryDistribution.cons O A t δ_h)
+    u δ_th = r t + (γ t).1 * u δ_h)
+  (h_ev : ∀ P : HistoryDistribution O A, -- Expected utility property.
+    Summable (fun h : History O A ↦ (P h).toReal * u (diracHistory O A h)) ∧
+    u P = ∑' h : History O A, (P h).toReal * u (diracHistory O A h)) :
+    ∀ t P, u (HistoryDistribution.cons O A t P) = r t + (γ t).1 * u P := by
+    intro t P
+    let μ_tP := HistoryDistribution.cons O A t P
+    let f : History O A → ℝ := fun h ↦ (μ_tP h).toReal * u (diracHistory O A h)
+    -- Summing over all histories is the same as summing those starting with t.
+    have h_reindex : ∑' h', f h' = ∑' h, f (t :: h) := by
+      refine ((List.cons_injective (a := t)).tsum_eq ?_).symm
+      intro h' hh'
+      have h_mass : μ_tP h' ≠ 0 := fun h0 => hh' (by simp [f, h0])
+      obtain ⟨h, -, rfl⟩ := (PMF.mem_support_map_iff _ _ _).1 ((PMF.mem_support_iff _ _).2 h_mass)
+      exact ⟨h, rfl⟩
+    -- Apply expected value property.
+    rw [(h_ev _).2, (h_ev P).2]
+    change ∑' h' : History O A, f h' = _
+    rw [h_reindex] -- Only keep histories starting with t.
+    -- t·P gives t :: h the same probability that P gives h.
+    have h_mass : ∀ h, μ_tP (t :: h) = P h := by
+      intro h
+      simp only [μ_tP, HistoryDistribution.cons]
+      rw [PMF.map_apply, tsum_eq_single h]
+      · simp
+      · intro b hb
+        simp [Ne.symm hb]
+    simp only [f, h_mass]
+    -- Prepending t to δ_h gives δ_th.
+    have h_dirac : ∀ h,
+      let δ_th := HistoryDistribution.cons O A t (diracHistory O A h)
+      diracHistory O A (t :: h) = δ_th :=
+        fun h ↦ (PMF.pure_map _ _).symm
+    simp_rw [h_dirac, h_sub, mul_add]
+    -- The first sum is finite.
+    have hs1 : Summable (fun h : History O A ↦ (P h).toReal) :=
+      ENNReal.summable_toReal (by simp [P.tsum_coe])
+    -- Second sum is finite.
+    have hs2 := (h_ev P).1.mul_left (γ t).1
+    -- Probabilities sum to one.
+    have h1 : ∑' h : History O A, (P h).toReal = 1 := by
+      rw [← ENNReal.tsum_toReal_eq (PMF.apply_ne_top P), P.tsum_coe, ENNReal.toReal_one]
+    simp_rw [mul_left_comm _ (γ t).1]
+    rw [Summable.tsum_add (hs1.mul_right _) hs2, tsum_mul_right, h1, one_mul, tsum_mul_left]
 
 -- 5. Theorem 4.1 (Markov Reward Theorem)
 theorem Markov_Reward_Theorem :
@@ -234,7 +229,7 @@ theorem Markov_Reward_Theorem :
             have reduced_thε : u_thε = α * u δ_th := by
               rw [expand_thε, h_ε, mul_zero, add_zero]
             have r_tε : u δ_tε = r t := by
-              exact congrArg u (cons_dirac O A t (ε O A))
+              exact congrArg u (PMF.pure_map _ _)
             have reduced_tεh : u_tεh = α * r t + (1 - α) * u δ_h := by
               rw [expand_tεh, r_tε]
 
@@ -259,7 +254,7 @@ theorem Markov_Reward_Theorem :
           unfold A5_TemporalγIndifference
           refine ⟨γ, ?_⟩
           intro P Q t g
-          have h_μsub := u_cons O A u r (fun t => (γ t).1) h_δsub h_lin
+          have h_μsub := distributional_subadditive_utility O A u r γ h_δsub h_lin
 
           -- Establish an equivalence with generic distributions.
           have h_umix :
